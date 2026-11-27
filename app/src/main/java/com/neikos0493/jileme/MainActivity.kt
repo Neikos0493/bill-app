@@ -1,6 +1,10 @@
 package com.neikos0493.jileme
 
 import android.os.Bundle
+import android.content.Intent
+import android.net.Uri
+import android.provider.OpenableColumns
+import kotlinx.coroutines.flow.MutableStateFlow
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.biometric.BiometricManager
@@ -30,6 +34,8 @@ class MainActivity : FragmentActivity() {
     private var currentLockType="NONE"
     private var biometricPrompt: BiometricPrompt?=null
     private var unlockCallback:(()->Unit)?=null
+    private val incomingImport=MutableStateFlow<Pair<Uri,String>?>(null)
+    private var lastIncomingIntent: Intent?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +46,7 @@ class MainActivity : FragmentActivity() {
             val snackbar=remember{SnackbarHostState()}
             LaunchedEffect(state.message){state.message?.let{snackbar.showSnackbar(it);viewModel.consumeMessage()}}
             LaunchedEffect(state.loading){if(!state.loading && state.settings.lastUpdateCheck<System.currentTimeMillis()-12*3600_000) viewModel.checkUpdate(false)}
+            LaunchedEffect(Unit){incomingImport.collect{incoming->if(incoming!=null){while(runCatching{nav.graph}.isFailure)kotlinx.coroutines.delay(50);viewModel.selectImport(incoming.second,incoming.first);nav.navigate("import");incomingImport.value=null}}}
             JilemeTheme(state.settings.themeMode){
                 if(state.settings.lockType!="NONE"&&!unlocked){
                     LockScreen(state.settings.lockType,state.settings.gestureHash,onBiometric={unlockCallback={unlocked=true;lockNonce++};showBiometric()},onUnlocked={unlocked=true;lockNonce++})
@@ -68,6 +75,12 @@ class MainActivity : FragmentActivity() {
         }
     }
 
+    public override fun onNewIntent(intent: Intent){super.onNewIntent(intent);setIntent(intent);handleIncoming(intent)}
+    private fun handleIncoming(intent: Intent){
+        if(lastIncomingIntent===intent)return;lastIncomingIntent=intent
+        val uri=if(intent.action==Intent.ACTION_SEND)intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)else if(intent.action==Intent.ACTION_VIEW)intent.data else null
+        if(uri!=null){val name=runCatching{contentResolver.query(uri,null,null,null,null)?.use{c->val i=c.getColumnIndex(OpenableColumns.DISPLAY_NAME);if(c.moveToFirst()&&i>=0)c.getString(i)else null}}.getOrNull()?:"shared-bill";incomingImport.value=uri to name}
+    }
     private fun showBiometric(){
         val authenticators=BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL
         if(BiometricManager.from(this).canAuthenticate(authenticators)!=BiometricManager.BIOMETRIC_SUCCESS){Toast.makeText(this,"设备未设置可用的指纹或锁屏",Toast.LENGTH_LONG).show();return}
@@ -75,4 +88,9 @@ class MainActivity : FragmentActivity() {
         biometricPrompt=prompt;prompt.authenticate(BiometricPrompt.PromptInfo.Builder().setTitle("解锁记了么").setSubtitle("验证身份后查看账单").setAllowedAuthenticators(authenticators).build())
     }
     override fun onStop(){super.onStop();if(currentLockType!="NONE")unlocked=false}
+    override fun onStart(){super.onStart();intent?.let(::handleIncoming)}
 }
+
+
+
+

@@ -15,10 +15,11 @@ class UpdateManagerTest {
     @Test fun githubLatestReleaseIsReachableAndMatches()=kotlinx.coroutines.runBlocking{
         val context=ApplicationProvider.getApplicationContext<Context>()
         val manager=UpdateManager(context)
-        val info=withTimeout(30_000){manager.check()}!!
+        var lastError: Throwable?=null;var found: com.neikos0493.jileme.update.UpdateInfo?=null;repeat(3){if(found==null){try{found=withTimeout(30_000){manager.check()}}catch(t:Throwable){lastError=t}}};val info=found ?: throw lastError!!
         assertEquals(2,info.versionCode)
         assertEquals("1.0.1",info.versionName)
         assertFalse(manager.isNewer(info))
     }
 }
+
 

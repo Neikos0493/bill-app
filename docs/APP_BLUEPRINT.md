@@ -13,8 +13,8 @@
 | 平台 | Android，单用户，个人自用 |
 | 蓝图版本 | v0.5 |
 | 蓝图状态 | 已确认，进入开发 |
-| 开发状态 | 首版 v1.0.1 已完成并发布 |
-| 最新 App 版本 | 1.0.1（versionCode 2，已发布） |
+| 开发状态 | 首版 v1.0.2 已完成并发布 |
+| 最新 App 版本 | 1.0.2（versionCode 3，已发布） |
 | 数据策略 | 仅本地保存，用户手动备份 |
 | 最近更新 | 2026-11-27 |
 
@@ -531,6 +531,7 @@ https://github.com/Neikos0493/bill-app/releases/latest/download/app-release.apk
 
 | 版本 | versionCode | 日期 | Release | 验证结果 |
 | --- | ---: | --- | --- | --- |
+| 1.0.2 | 3 | 2026-11-27 | https://github.com/Neikos0493/bill-app/releases/tag/v1.0.2 | 分享导入、7 项仪器测试、签名与 Release 构建通过 |
 | 1.0.1 | 2 | 2026-11-27 | https://github.com/Neikos0493/bill-app/releases/tag/v1.0.1 | 签名、下载哈希、覆盖升级与更新检查通过 |
 
 ---
@@ -727,7 +728,7 @@ https://github.com/Neikos0493/bill-app/releases/latest/download/app-release.apk
 ## 19. 当前快速结论
 
 - 首版功能已经实现，并通过构建、单元测试、仪器测试和覆盖升级验证。
-- v1.0.1 已发布到 GitHub Releases，可直接下载签名 APK。
+- v1.0.2 已发布到 GitHub Releases，可直接下载签名 APK。
 - 后续需求、缺陷修复和新版本继续以本文档作为首要速查入口。
 
 ---
@@ -753,7 +754,7 @@ https://github.com/Neikos0493/bill-app/releases/latest/download/app-release.apk
 ### 2026-11-27 首版验证
 
 - `testDebugUnitTest`：11 项测试全部通过。
-- `connectedDebugAndroidTest`：5 项功能仪器测试及 1 项 GitHub 联网更新测试全部通过，运行环境为 Android 9（API 28）模拟器。
+- `connectedDebugAndroidTest`：7 项仪器测试全部通过，包含 GitHub 联网更新与 content:// 分享账单冷启动，运行环境为 Android 9（API 28）模拟器。
 - Compose 端到端测试覆盖启动、创建支出、支出页面开启 AA、跨账户回款和数据库关联。
 - Room 测试覆盖 AA、退款、编辑原支出、删除原支出保留流水及重复导入。
 - 数据测试覆盖完整备份导出／恢复、CSV 导出、XLSX 解析和手势哈希验证。
@@ -771,3 +772,11 @@ https://github.com/Neikos0493/bill-app/releases/latest/download/app-release.apk
 - 最新版本 JSON 已通过 `/releases/latest/download/version.json` 验证。
 - 从 `/releases/latest/download/app-release.apk` 重新下载 APK 后，SHA-256 与本地签名构建一致。
 - Android 端 `UpdateManager` 已实际访问 GitHub，确认 `versionCode=2`、`versionName=1.0.1`，且当前版本无需更新。
+
+### v1.0.2 分享导入补充
+
+- 主 Activity 支持 `ACTION_SEND` 与 `ACTION_VIEW` 的账单文件 Intent。
+- 冷启动时等待导航图初始化后再进入导入页面，避免提前导航崩溃。
+- `content://` 分享样本已成功进入预检并识别 1 条有效记录。
+- 退款通知在编辑时默认开启退款模式；AA 回款在候选唯一时可建议原支出。
+- v1.0.2 APK SHA-256：`bcf583d5921d168acdbcbf87e2c6da02de6f89e8adb20e729d4d360dfd584681`。

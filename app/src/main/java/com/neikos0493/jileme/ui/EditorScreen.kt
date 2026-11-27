@@ -44,7 +44,7 @@ private data class ReceiptDraft(val id: Long=0,val amount: String="",val account
         if(existing!=null && !loaded) {
             amount=Money.input(existing.amountMinor);accountId=existing.accountId;toAccountId=existing.toAccountId ?: 0;categoryId=existing.categoryId ?: 0
             merchant=existing.merchant;note=existing.note;occurredAt=existing.occurredAt;kind=existing.kind;aaEnabled=existing.aaEnabled
-            refund=existing.nature==TxnNature.REFUND;aaReceipt=existing.nature==TxnNature.AA_RECEIPT;feeMode=existing.feeMode;feeRate=existing.feeRate;feeFixed=if(existing.feeAmountMinor>0) Money.input(existing.feeAmountMinor) else ""
+            refund=existing.nature==TxnNature.REFUND||existing.nature==TxnNature.REFUND_UNLINKED;aaReceipt=existing.nature==TxnNature.AA_RECEIPT;feeMode=existing.feeMode;feeRate=existing.feeRate;feeFixed=if(existing.feeAmountMinor>0) Money.input(existing.feeAmountMinor) else ""
             refundExpenseId=state.links.firstOrNull{it.offsetTransactionId==existing.id}?.expenseId ?: 0
             receipts=state.links.filter{it.expenseId==existing.id && it.kind==LinkKind.AA}.mapNotNull{link->state.transactions.firstOrNull{it.id==link.offsetTransactionId}?.let{ReceiptDraft(it.id,Money.input(it.amountMinor),it.accountId,it.merchant)}}
             loaded=true
@@ -77,7 +77,7 @@ private data class ReceiptDraft(val id: Long=0,val amount: String="",val account
                     val received=receipts.sumOf{Money.parse(it.amount)?:0};Text("已收 ${Money.format(received)} · 实际承担 ${Money.format((Money.parse(amount)?:0)-received)}",fontWeight=FontWeight.SemiBold)
                 }
             }
-            if(kind==TxnKind.INCOME){HorizontalDivider();Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Column{Text("这是退款",fontWeight=FontWeight.Bold);Text("关联原支出，不计普通收入",style=MaterialTheme.typography.bodySmall)};Switch(refund,{refund=it;if(it)aaReceipt=false},modifier=Modifier.semantics{contentDescription="退款开关"})};Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Column{Text("作为 AA 回款",fontWeight=FontWeight.Bold);Text("可关联其他账户产生的支出",style=MaterialTheme.typography.bodySmall)};Switch(aaReceipt,{aaReceipt=it;if(it)refund=false})};if(refund||aaReceipt){StringSelector("关联原支出",expenseOptions.firstOrNull{it.first==refundExpenseId.toString()}?.second.orEmpty(),expenseOptions){refundExpenseId=it.toLong()};if(refundExpenseId!=0L){val original=state.transactions.firstOrNull{it.id==refundExpenseId};if(original!=null)Text("原支出净额：${Money.format(LedgerCalculator.netExpense(original,state.transactions,state.links))}",color=MaterialTheme.colorScheme.secondary)}}}
+            if(kind==TxnKind.INCOME){HorizontalDivider();Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Column{Text("这是退款",fontWeight=FontWeight.Bold);Text("关联原支出，不计普通收入",style=MaterialTheme.typography.bodySmall)};Switch(refund,{refund=it;if(it)aaReceipt=false},modifier=Modifier.semantics{contentDescription="退款开关"})};Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Column{Text("作为 AA 回款",fontWeight=FontWeight.Bold);Text("可关联其他账户产生的支出",style=MaterialTheme.typography.bodySmall)};Switch(aaReceipt,{aaReceipt=it;if(it){refund=false;if(refundExpenseId==0L){val value=Money.parse(amount);val candidates=state.transactions.filter{t->t.kind==TxnKind.EXPENSE&&t.status==TxnStatus.CONFIRMED&&(value==null||t.amountMinor==value)};if(candidates.size==1)refundExpenseId=candidates.first().id}}})};if(refund||aaReceipt){StringSelector("关联原支出",expenseOptions.firstOrNull{it.first==refundExpenseId.toString()}?.second.orEmpty(),expenseOptions){refundExpenseId=it.toLong()};if(refundExpenseId!=0L){val original=state.transactions.firstOrNull{it.id==refundExpenseId};if(original!=null)Text("原支出净额：${Money.format(LedgerCalculator.netExpense(original,state.transactions,state.links))}",color=MaterialTheme.colorScheme.secondary)}}}
             error?.let{Text(it,color=MaterialTheme.colorScheme.error)}
             Button({
                 val value=Money.parse(amount)
@@ -94,6 +94,7 @@ private data class ReceiptDraft(val id: Long=0,val amount: String="",val account
     }
     if(showDelete)AlertDialog(onDismissRequest={showDelete=false},title={Text("删除账单？")},text={Text("关联的 AA 或退款流水会保留并标记为未关联。")},confirmButton={TextButton({viewModel.deleteTransaction(transactionId);showDelete=false;onBack()}){Text("删除")}},dismissButton={TextButton({showDelete=false}){Text("取消")}})
 }
+
 
 
 

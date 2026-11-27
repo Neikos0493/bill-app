@@ -38,7 +38,5 @@ class AppSmokeTest {
         org.junit.Assert.assertEquals(12000,receipt.amountMinor)
         org.junit.Assert.assertTrue(account.name.contains("微信"))
         org.junit.Assert.assertEquals(com.neikos0493.jileme.data.LinkKind.AA,link.kind)
-    }}
-
-
-
+        }
+}
