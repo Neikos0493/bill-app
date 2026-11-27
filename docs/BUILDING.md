@@ -64,3 +64,5 @@ keyPassword=替换为本地密码
 ## 自动化
 
 `.github/workflows/android.yml` 在推送到 `main` 或收到 PR 时运行单元测试、Debug 构建并上传构建产物。
+
+Gradle 优先使用 Google、Maven Central 和 Gradle Plugin Portal 官方仓库，阿里云镜像仅作为后备，避免镜像异常中断云端依赖解析。

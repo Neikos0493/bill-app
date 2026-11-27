@@ -12,7 +12,7 @@
 | 仓库地址 | https://github.com/Neikos0493/bill-app |
 | 平台 | Android，单用户，个人自用 |
 | 蓝图版本 | v0.5 |
-| 蓝图状态 | 已确认，进入开发 |
+| 蓝图状态 | 已确认，首版已落地，后续按需迭代 |
 | 开发状态 | 首版 v1.0.2 已完成并发布 |
 | 最新 App 版本 | 1.0.2（versionCode 3，已发布） |
 | 数据策略 | 仅本地保存，用户手动备份 |
@@ -722,6 +722,7 @@ https://github.com/Neikos0493/bill-app/releases/latest/download/app-release.apk
 | v0.3 | 2026-11-27 | AA 支持付款与回款跨支付平台、跨账户。 |
 | v0.4 | 2026-11-27 | AA 收入口移至支出页面，直接记录回款金额与去向。 |
 | v0.5 | 2026-11-27 | 退款改为收入页面的关联功能，统一 AA／退款净支出口径。 |
+| v1.0 | 2026-11-27 | 首版功能、测试、签名发布、覆盖升级与分享导入全部落地，转为持续维护文档。 |
 
 ---
 
@@ -779,4 +780,14 @@ https://github.com/Neikos0493/bill-app/releases/latest/download/app-release.apk
 - 冷启动时等待导航图初始化后再进入导入页面，避免提前导航崩溃。
 - `content://` 分享样本已成功进入预检并识别 1 条有效记录。
 - 退款通知在编辑时默认开启退款模式；AA 回款在候选唯一时可建议原支出。
-- v1.0.2 APK SHA-256：`bcf583d5921d168acdbcbf87e2c6da02de6f89e8adb20e729d4d360dfd584681`。
+- v1.0.2 APK SHA-256：cf583d5921d168acdbcbf87e2c6da02de6f89e8adb20e729d4d360dfd584681。
+
+### GitHub Actions 与发布资产最终复核
+
+- GitHub Actions 运行 46019883900 已成功：	estDebugUnitTest、ssembleDebug 和 Debug APK 产物上传全部通过。
+- 运行地址：https://github.com/Neikos0493/bill-app/actions/runs/46019883900
+- 仓库顺序调整后，已在英文路径映射 `C:\Users\a2643\JilemeProject` 重新运行 `build.ps1`，单元测试和 Debug 构建通过。
+- 云端曾受阿里云镜像 502 影响，现已调整为官方 Maven 仓库优先、镜像后备，并复验通过。
+- GitHub Releases API 确认 1.0.2 为最新发布，包含 pp-release.apk 和 ersion.json。
+- GitHub 资产摘要确认 APK 为 sha256:bcf583d5921d168acdbcbf87e2c6da02de6f89e8adb20e729d4d360dfd584681，与本地签名 APK 完全一致。
+- GitHub 资产摘要确认 ersion.json 为 sha256:fc235a86ab85a47bb83ea9b130852f181b2c48e963f7f3ef324d5880927bcc3d，与本地发布元数据完全一致。
