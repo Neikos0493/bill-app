@@ -1,0 +1,8 @@
+{
+  "versionCode": 2,
+  "versionName": "1.0.1",
+  "apkUrl": "https://github.com/Neikos0493/bill-app/releases/latest/download/app-release.apk",
+  "releaseNotes": "记了么首个可用版本：手动记账、账户余额、月预算、转账手续费、跨账户 AA、关联退款、支付通知预添加、官方账单导入、本地备份、指纹／手势锁与 GitHub 更新。",
+  "forceUpdate": false,
+  "sha256": "3c3a9b867a60845bf2920db7886b65ff6c5785fd59b13522a51b4c77bfbc8ce4"
+}

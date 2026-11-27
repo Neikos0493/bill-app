@@ -1,0 +1,14 @@
+# Windows
+*.iml
+.idea/
+.gradle/
+build/
+**/build/
+local.properties
+keystore.properties
+*.jks
+*.keystore
+captures/
+.externalNativeBuild/
+.cxx/
+.DS_Store
