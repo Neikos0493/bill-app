@@ -6,7 +6,7 @@
 
 - 蓝图版本：v0.5
 - 需求状态：已确认，进入开发
-- 开发状态：首版实现完成，测试通过，准备发布
+- 开发状态：首版已完成并发布
 - 数据策略：仅本地保存，手动备份
 - 当前版本：1.0.1（versionCode 2）
 
@@ -30,6 +30,9 @@
 
 后续通过本仓库的 GitHub Releases 发布 `version.json` 和 `app-release.apk`。
 
-当前尚未发布可安装版本。
+**[下载记了么 v1.0.1 APK](https://github.com/Neikos0493/bill-app/releases/latest/download/app-release.apk)**
+
+完整版本说明见 [v1.0.1 Release](https://github.com/Neikos0493/bill-app/releases/tag/v1.0.1)。
+
 
 
